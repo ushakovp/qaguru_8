@@ -13,14 +13,17 @@ public class SearchTests {
 
     private static final String REPOSITORY = "selenide";
 
-
-    @ValueSource(strings = {"selenide", "selenoid", "playwright"})
-    @ParameterizedTest(name = "Есть репозитарий {0}")
-    void repositoryHasIssueListenerTest(String testData) {
-        open("https://github.com/");
+    private static void githubSearch(String testData) {
         $("[data-test-selector=nav-search-input]").click();
         $("[data-test-selector=nav-search-input]").setValue(testData);
         $("[data-test-selector=nav-search-input]").submit();
+    }
+
+    @ValueSource(strings = {"selenide", "selenoid", "playwright"})
+    @ParameterizedTest(name = "Есть репозитарий {0}")
+    void searchRepositoryTest(String testData) {
+        open("https://github.com/");
+        githubSearch(testData);
         $(byText(testData)).should(exist);
     }
 
@@ -30,11 +33,9 @@ public class SearchTests {
             "playwright, Playwright is a framework for Web Testing and Automation."
     })
     @ParameterizedTest(name = "На странице поиска, для  \"{0}\" есть описание -  \"{0}\"")
-    void tst(String testData, String expectedResult) {
+    void shouldHaveDescriptionOnSearchPageTest(String testData, String expectedResult) {
         open("https://github.com/");
-        $("[data-test-selector=nav-search-input]").click();
-        $("[data-test-selector=nav-search-input]").setValue(testData);
-        $("[data-test-selector=nav-search-input]").submit();
+        githubSearch(testData);
         $(byText(testData)).should(exist);
         $$("li.repo-list-item").first().shouldHave(text(expectedResult));
     }
